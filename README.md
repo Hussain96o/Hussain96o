@@ -12,4 +12,4 @@
 [![](https://visitcount.itsvg.in/api?id=Hussain96o&icon=10&color=1)](https://visitcount.itsvg.in)
 
 <!-- Proudly created with GPRM ( https://gprm.itsvg.in ) -->
-[![Join our Discord server!](https://invidget.switchblade.xyz/2FB8wDG)](https://discord.gg/mwj)
+[![Join our Discord server!](https://discord.gg/mwj)](https://discord.gg/mwj)
