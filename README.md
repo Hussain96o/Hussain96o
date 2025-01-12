@@ -11,4 +11,3 @@
 ---
 [![](https://visitcount.itsvg.in/api?id=Hussain96o&icon=10&color=1)](https://visitcount.itsvg.in)
 
-[![Join our Discord server!](https://invidget.switchblade.xyz/mwj)](https://discord.gg/mwj)
