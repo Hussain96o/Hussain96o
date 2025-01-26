@@ -8,5 +8,5 @@
 
 <img src="https://github-readme-stats.vercel.app/api/top-langs?username=Hussain96o&show_icons=true&locale=en&layout=compact&theme=tokyonight" alt="GitHub Stats" />
 ---
-[![](https://visitcount.itsvg.in/api?id=Hussain96o&icon=10&color=1)](https://visitcount.itsvg.in)
+
 
