@@ -1,4 +1,4 @@
-# Hi <img src="https://media.tenor.com/PgmQkFlqefYAAAAi/neco-arc-neco-arc-chaos.gif" width="20" height="20" /> GitHub
+# Hi <img src="https://media.tenor.com/PgmQkFlqefYAAAAi/neco-arc-neco-arc-chaos.gif" width="40" height="40" /> 
 ## I'm Hussain 
 
 
