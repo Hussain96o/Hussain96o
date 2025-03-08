@@ -1,9 +1,7 @@
 <h1 align="center">Hi there! <img src="https://media.tenor.com/PgmQkFlqefYAAAAi/neco-arc-neco-arc-chaos.gif" width="40" height="40" /></h1>
 <h2 align="center">I'm Hussain <img src="https://media.tenor.com/rxIicFKVtpkAAAAi/neco-arc.gif" width="40" height="40" /></h2>
 
-<p align="center">
-  <img src="https://readme-typing-svg.herokuapp.com?color=%238AE009&size=24&center=true&vCenter=true&width=500&lines=Front-end+Developer;">
-</p>
+
 
 <p align="center">
   <img src="https://komarev.com/ghpvc/?username=Hussain96o&label=Profile+Views&color=8ae009&style=flat-square" alt="Profile Views" />
