@@ -1,0 +1,17 @@
+{
+  "devices": {
+    "A22 الخاص بـ HUSSIEN": {
+      "dayCounts": {
+        "2025-08-28": 0
+      },
+      "todaysWordCount": {}
+    }
+  },
+  "userId": "58ff706d-61b4-463c-8064-aee7c74140b6",
+  "publicPaths": [],
+  "timezone": "Asia/Amman",
+  "privateMode": false,
+  "statusBarStats": true,
+  "linkedNotesEnabled": true,
+  "linkedNotesMaxDepth": 1
+}
