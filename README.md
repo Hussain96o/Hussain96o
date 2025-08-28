@@ -28,7 +28,7 @@
 
 
 
-##  Discord   
+##  Discord  . 
 <div align="center">
   <a href="https://discord.com/users/906845963086340126">
     <img src="https://lanyard.cnrad.dev/api/906845963086340126?showDisplayName=true&borderRadius=30px&bg=0F0F0F" />
