@@ -16,7 +16,7 @@
   <img src="https://img.shields.io/badge/HTML5-%23E34F26.svg?style=for-the-badge&logo=html5&logoColor=white" />
   <img src="https://img.shields.io/badge/CSS3-%231572B6.svg?style=for-the-badge&logo=css3&logoColor=white" />
  
----
+ ---
 
 ## 📊 GitHub Stats  
 <div align="center">
@@ -28,7 +28,7 @@
 
 
 
-## 🎮 Discord Presence  
+##  Discord   
 <div align="center">
   <a href="https://discord.com/users/906845963086340126">
     <img src="https://lanyard.cnrad.dev/api/906845963086340126?showDisplayName=true&borderRadius=30px&bg=0F0F0F" />

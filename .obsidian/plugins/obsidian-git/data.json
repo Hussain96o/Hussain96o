@@ -9,7 +9,7 @@
   "autoPullOnBoot": false,
   "autoCommitOnlyStaged": false,
   "disablePush": false,
-  "pullBeforePush": true,
+  "pullBeforePush": false,
   "disablePopups": false,
   "showErrorNotices": true,
   "disablePopupsForNoChanges": false,
@@ -31,7 +31,7 @@
   "submoduleRecurseCheckout": false,
   "gitDir": "",
   "showFileMenu": true,
-  "authorInHistoryView": "hide",
+  "authorInHistoryView": "full",
   "dateInHistoryView": true,
   "diffStyle": "split",
   "lineAuthor": {

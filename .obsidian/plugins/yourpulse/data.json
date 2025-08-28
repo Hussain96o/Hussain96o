@@ -4,7 +4,12 @@
       "dayCounts": {
         "2025-08-28": 0
       },
-      "todaysWordCount": {}
+      "todaysWordCount": {
+        "README.md": {
+          "initial": 168,
+          "current": 167
+        }
+      }
     }
   },
   "userId": "58ff706d-61b4-463c-8064-aee7c74140b6",

@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Changelog.md",
-                "mode": "source",
+                "file": "README.md",
+                "mode": "preview",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "Changelog"
+              "title": "README"
             }
           }
         ]
@@ -153,18 +153,27 @@
       "command-palette:إفتح لوحة الأوامر": false,
       "markdown-importer:إفتح مستورد Markdown": false,
       "bases:أنشئ قاعدة جديدة": false,
+      "audio-recorder:بدء/إيقاف التسجيل": false,
       "iconic:فتح كتاب القواعد": false,
       "omnisearch:Omnisearch": false,
-      "audio-recorder:بدء/إيقاف التسجيل": false,
       "yourpulse:Open YourPulse Profile": false,
       "obsidian-git:Open Git source control": false
     }
   },
   "active": "ce10d56138b276ce",
   "lastOpenFiles": [
-    "README.md",
-    "GitHub",
     "Changelog.md",
+    "workspace-mobile.json",
+    "types.json",
+    "templates.json",
+    "pdf-annotations.json",
+    "page-preview.json",
+    "daily-notes.json",
+    "core-plugins.json",
+    "community-plugins.json",
+    "appearance.json",
+    "app.json",
+    "README.md",
     "الأغنام/العدد الإجمالي.md",
     "90 يوم/تحدي 90 يوم.md",
     "الأغنام/السجلات.md",
@@ -176,26 +185,17 @@
     "Images/Screenshot_20250726_223426_Pinterest.png",
     "Images/SmartSelect_20250725_100454_Kotatsu.jpg",
     "assets/f5b51127ae1c6d162a2cc817c59629ba.jpg",
-    "assets",
     "SmartSelect_20250725_100454_Kotatsu.jpg",
     "Images/f5b51127ae1c6d162a2cc817c59629ba.jpg",
     "Images/4b1a22e40c2c3613ba977b97a731e4df.jpg",
-    "90 يوم",
-    "Images/Farms-Rachel_Bladon.mp3",
     "English/Books/Song of the Wind on a Southern Shore.md",
     "English/Sorces.md",
-    "Images/songs-of-the-wind-on-a-southern-shore-and-other-poems-of-florida-003-song-of-the-wind-on-a-southern-shore.pdf",
-    "Images/songs-of-the-wind-on-a-southern-shore-and-other-poems-of-florida-003-song-of-the-wind-on-a-southern-shore.4377.mp3",
-    "English/Books/بدون عنوان",
-    "English/Books",
     "English language/📘 Vocabulary/trap.md",
-    "English",
     "English language/📘 Vocabulary/roar.md",
     "English language/📋 Practice/Quiz_The_Lion_and_the_Mouse.md",
     "English language/📖 Readings/The Lion and the Mouse.md",
     "English language/📂 Notes/Daily Review.md",
     "تحدي 90 يوم/90 days.md",
-    "English language",
     "Test/بدون عنوان.md",
     "Excalidraw/ExcalidrawStartup.md",
     "Images/UzaMaid! [Banner].png",
