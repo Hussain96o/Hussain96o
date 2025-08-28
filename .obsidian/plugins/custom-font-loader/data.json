@@ -1,7 +1,0 @@
-{
-  "font_folder": ".obsidian/fonts/",
-  "font": "XB-YasBd.ttf",
-  "force_mode": true,
-  "custom_css_mode": false,
-  "custom_css": ":root * {\n\t\t--font-default: XB-YasBd;\n\t\t--default-font: XB-YasBd;\n\t\t--font-family-editor: XB-YasBd;\n\t\t--font-monospace-default: XB-YasBd,\n\t\t--font-interface-override: XB-YasBd,\n\t\t--font-text-override: XB-YasBd,\n\t\t--font-monospace-override: XB-YasBd,\t\n\t}\n"
-}
