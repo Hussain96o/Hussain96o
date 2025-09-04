@@ -1,6 +1,7 @@
 import requests
 from weasyprint import HTML
 from pdf2image import convert_from_path
+import base64
 
 USERNAME = "Hussain96o"  # ضع هنا اسم حسابك
 
@@ -13,6 +14,10 @@ public_repos = data.get("public_repos", 0)
 followers = data.get("followers", 0)
 following = data.get("following", 0)
 
+# --- تحويل الخلفية إلى Base64 ---
+with open("assets/background.png", "rb") as f:
+    encoded_bg = base64.b64encode(f.read()).decode()
+
 # --- HTML + CSS ---
 html_template = f"""
 <!DOCTYPE html>
@@ -23,7 +28,7 @@ html_template = f"""
     body {{
         width: 800px;
         height: 600px;
-        background: url('assets/background.png') no-repeat center center;
+        background: url('data:image/png;base64,{encoded_bg}') no-repeat center center;
         background-size: cover;
         display: flex;
         align-items: center;
@@ -64,4 +69,4 @@ HTML(string=html_template).write_pdf("assets/stats.pdf")
 pages = convert_from_path("assets/stats.pdf", dpi=200)
 pages[0].save("assets/stats.png", "PNG")
 
-print("✅ تم تحديث الصورة stats.png بنجاح!")
+print("✅ تم تحديث الصورة stats.png بنجاح مع الخلفية!")
