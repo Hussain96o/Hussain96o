@@ -87,16 +87,4 @@ output_path = "assets/stats.png"
 # 2. الآن يمكنك حفظ هذا المستند كـ PNG
 HTML(string=html_template).render().write_png(output_path)
 
-print(f"✅ تم تحديث الصورة stats.png مباشرة بنجاح بأبعاد {width}x{height}!")```
-
-### شرح التصحيح:
-
-السطر الذي سبب المشكلة كان:
-`HTML(string=html_template).write_png(output_path)`
-
-والسطر الصحيح هو:
-`HTML(string=html_template).render().write_png(output_path)`
-
-الفارق هو إضافة `.render()` في المنتصف. هذه الدالة تقوم بتحويل الـ HTML إلى مستند جاهز للعرض، وهذا المستند هو الذي يمتلك القدرة على تصدير نفسه كملف PNG باستخدام دالة `write_png`.
-
-آسف مرة أخرى على الخطأ، هذا الكود يجب أن يعمل الآن بدون أي مشاكل وينتج الصورة مباشرة.
+print(f"✅ تم تحديث الصورة stats.png مباشرة بنجاح بأبعاد {width}x{height}!")
