@@ -25,10 +25,11 @@ jobs:
             libpango-1.0-0 \
             libcairo2 \
             libpangoft2-1.0-0 \
-            libpangocairo-1.0-0
+            libpangocairo-1.0-0 \
+            poppler-utils
 
       - name: Install Python dependencies
-        run: pip install requests weasyprint
+        run: pip install requests weasyprint pdf2image
 
       - name: Generate stats image
         run: python generate_stats.py
