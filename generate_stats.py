@@ -35,15 +35,21 @@ lines = [
     f"Following: {following}"
 ]
 
-# حساب أبعاد كتلة النص
+# --- التغييرات هنا ---
+# حساب أبعاد كتلة النص باستخدام الدوال الجديدة
 padding = 20
-line_height = font.getsize("hg")[1]  # 'hg' للحصول على ارتفاع تقريبي
+# الحصول على ارتفاع السطر من خصائص الخط نفسه
+line_height = font.getbbox("A")[3] + font.getbbox("g")[3] # طريقة موثوقة لحساب ارتفاع السطر
+
 total_text_height = len(lines) * line_height + (len(lines) - 1) * padding
 max_text_width = 0
 for line in lines:
-    line_width, _ = draw.textsize(line, font=font)
+    # استخدام draw.textlength() لحساب عرض النص
+    line_width = draw.textlength(line, font=font)
     if line_width > max_text_width:
         max_text_width = line_width
+# --- نهاية التغييرات ---
+
 
 # إعداد خلفية شبه شفافة للنصوص
 rect_width = max_text_width + 2 * padding
@@ -61,7 +67,8 @@ draw.rectangle(
 # كتابة النص فوق المستطيل
 y = rect_y0 + padding / 2
 for line in lines:
-    text_width, _ = draw.textsize(line, font=font)
+    # استخدام draw.textlength() لحساب عرض النص مرة أخرى للمحاذاة
+    text_width = draw.textlength(line, font=font)
     x = (width - text_width) / 2
     draw.text((x, y), line, font=font, fill=(255, 255, 255, 255))
     y += line_height + padding
