@@ -1,12 +1,12 @@
 import requests
 from weasyprint import HTML
 from pdf2image import convert_from_path
+from PIL import Image
 import base64
-from PIL import Image  # إضافة مكتبة Pillow لقراءة أبعاد الصورة
 
-USERNAME = "Hussain96o"
+USERNAME = "Hussain96o"  # ضع هنا اسم حسابك
 
-# --- جلب بيانات GitHub API ---
+# --- جلب بيانات الحساب من GitHub API ---
 url = f"https://api.github.com/users/{USERNAME}"
 data = requests.get(url).json()
 
@@ -19,9 +19,8 @@ following = data.get("following", 0)
 with open("assets/background.png", "rb") as f:
     encoded_bg = base64.b64encode(f.read()).decode()
 
-# --- قراءة أبعاد الصورة الأصلية ---
-with Image.open("assets/background.png") as img:
-    width, height = img.size  # الحصول على الأبعاد الأصلية للصورة
+# --- تحديد أبعاد 16:9 ---
+width, height = 800, 450  # 16:9
 
 # --- HTML + CSS ---
 html_template = f"""
@@ -44,15 +43,15 @@ html_template = f"""
     }}
     .box {{
         background: rgba(0,0,0,0.6);
-        padding: 30px 50px;
+        padding: 20px 40px;
         border-radius: 15px;
         text-align: center;
         color: white;
-        font-size: 28px;
+        font-size: 24px;
     }}
     .box h1 {{
-        margin: 0 0 20px 0;
-        font-size: 36px;
+        margin: 0 0 15px 0;
+        font-size: 32px;
     }}
   </style>
 </head>
@@ -68,10 +67,12 @@ html_template = f"""
 """
 
 # --- حفظ PDF أولاً ---
-HTML(string=html_template).write_pdf("assets/stats.pdf")
+pdf_path = "assets/stats.pdf"
+HTML(string=html_template).write_pdf(pdf_path)
 
-# --- تحويل PDF إلى PNG ---
-pages = convert_from_path("assets/stats.pdf", dpi=200)
-pages[0].save("assets/stats.png", "PNG")
+# --- تحويل PDF إلى PNG بنفس الأبعاد 16:9 ---
+pages = convert_from_path(pdf_path, dpi=200)
+img = pages[0].resize((width, height), Image.ANTIALIAS)
+img.save("assets/stats.png", "PNG")
 
-print(f"✅ تم تحديث الصورة stats.png بنجاح بأبعاد الصورة الأصلية ({width}x{height})!")
+print("✅ تم تحديث الصورة stats.png بنجاح بنفس أبعاد الخلفية 16:9!")
