@@ -72,7 +72,7 @@ HTML(string=html_template).write_pdf(pdf_path)
 
 # --- تحويل PDF إلى PNG بنفس الأبعاد 16:9 ---
 pages = convert_from_path(pdf_path, dpi=200)
-img = pages[0].resize((width, height), Image.ANTIALIAS)
+img = pages[0].resize((width, height), Image.Resampling.LANCZOS)
 img.save("assets/stats.png", "PNG")
 
 print("✅ تم تحديث الصورة stats.png بنجاح بنفس أبعاد الخلفية 16:9!")
