@@ -5,16 +5,16 @@ from collections import Counter
 import time
 
 USERNAME = "Hussain96o"
-GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN")
-HEADERS = {"Authorization": f"token {GITHUB_TOKEN}"} if GITHUB_TOKEN else {}
+# تم حذف GITHUB_TOKEN و HEADERS من هنا
 
 def get_github_stats(username):
     """
-    يجلب إحصائيات GitHub المتقدمة (الكوميتات، النجوم، واللغات).
+    يجلب إحصائيات GitHub المتقدمة (الكوميتات، النجوم، واللغات) بدون توكن.
     """
-    print("Fetching user and repository data...")
+    print("Fetching user and repository data (unauthenticated)...")
     user_url = f"https://api.github.com/users/{username}"
-    user_data = requests.get(user_url, headers=HEADERS).json()
+    # تم حذف headers من طلب requests
+    user_data = requests.get(user_url).json()
     
     public_repos_count = user_data.get("public_repos", 0)
     name = user_data.get("name", username)
@@ -23,9 +23,13 @@ def get_github_stats(username):
     all_repos = []
     page = 1
     while True:
-        response = requests.get(f"{repos_url}&page={page}", headers=HEADERS)
+        # تم حذف headers من طلب requests
+        response = requests.get(f"{repos_url}&page={page}")
         repos = response.json()
         if not repos or not isinstance(repos, list):
+            # تحقق من رسالة الخطأ لتحديد ما إذا كان السبب هو تجاوز الحد
+            if isinstance(repos, dict) and 'message' in repos:
+                print(f"❌ API Error: {repos['message']}")
             break
         all_repos.extend(repos)
         page += 1
@@ -38,26 +42,26 @@ def get_github_stats(username):
         repo_name = repo['name']
         print(f"  - Processing repo {i+1}/{len(all_repos)}: {repo_name}")
         
-        # إحصاء اللغات
         language = repo.get("language")
         if language:
             language_counts[language] += 1
             
-        # جلب إحصائيات الكوميت (هذه العملية قد تكون بطيئة)
         commit_stats_url = f"https://api.github.com/repos/{username}/{repo_name}/stats/contributors"
-        # قد تستغرق واجهة API بعض الوقت لتجهيز الإحصائيات
-        for _ in range(3): # محاولة 3 مرات
-            stats_response = requests.get(commit_stats_url, headers=HEADERS)
+        for _ in range(3):
+            # تم حذف headers من طلب requests
+            stats_response = requests.get(commit_stats_url)
             if stats_response.status_code == 200:
                 contributors = stats_response.json()
                 if isinstance(contributors, list):
                     for contributor in contributors:
                         if contributor['author']['login'].lower() == username.lower():
                             total_commits += contributor['total']
-                break # اخرج من حلقة المحاولات عند النجاح
-            time.sleep(2) # انتظر ثانيتين قبل المحاولة مرة أخرى
+                break
+            elif stats_response.status_code == 403: # خطأ تجاوز الحد
+                 print("  - Rate limit likely exceeded. Skipping commit stats for this repo.")
+                 break # اخرج من حلقة المحاولات
+            time.sleep(2)
 
-    # تجهيز أفضل 3 لغات
     top_languages = [lang for lang, count in language_counts.most_common(3)]
     
     return {
@@ -67,37 +71,12 @@ def get_github_stats(username):
         "languages": top_languages,
     }
 
-def draw_column(draw, content, x, y, width, height, font_title, font_value):
-    """
-    يرسم عمودًا واحدًا مع توسيط محتواه.
-    """
-    title = content["title"]
-    value = str(content["value"])
-    
-    cx = x + width / 2 # مركز العمود الأفقي
-    
-    # رسم العنوان في الأعلى
-    title_width = draw.textlength(title, font=font_title)
-    draw.text(
-        (cx - title_width / 2, y + 25), 
-        title, 
-        font=font_title, 
-        fill=(220, 220, 220, 200) # لون رمادي فاتح
-    )
-    
-    # رسم القيمة في المنتصف
-    value_width = draw.textlength(value, font=font_value)
-    draw.text(
-        (cx - value_width / 2, y + (height / 2) - 10),
-        value,
-        font=font_value,
-        fill=(255, 255, 255) # لون أبيض ساطع
-    )
-
-# --- الجزء الرئيسي من السكريبت ---
+# --- الجزء الرئيسي من السكريبت (لم يتغير) ---
 if __name__ == "__main__":
     stats = get_github_stats(USERNAME)
     
+    # ... باقي الكود من هنا إلى النهاية يبقى كما هو تمامًا ...
+    # ... (لصق باقي الكود الخاص بالرسم هنا) ...
     # --- إعداد الصورة ---
     img = Image.open("assets/background.png").convert("RGBA")
     font_title = ImageFont.truetype("arial.ttf", size=18)
