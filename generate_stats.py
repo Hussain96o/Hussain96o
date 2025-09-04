@@ -13,8 +13,8 @@ public_repos = data.get("public_repos", 0)
 followers = data.get("followers", 0)
 following = data.get("following", 0)
 
-# فتح الصورة من المسار assets/stats.jpg
-img_path = "assets/stats.jpg"
+# فتح الصورة من المسار assets/stats.png
+img_path = "assets/stats.png"
 img = Image.open(img_path).convert("RGBA")
 draw = ImageDraw.Draw(img)
 width, height = img.size
