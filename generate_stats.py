@@ -1,24 +1,33 @@
 import requests
 from PIL import Image, ImageDraw, ImageFont
 
-USERNAME = "Hussain96o"
+USERNAME = "Hussain96o"  # ضع هنا اسم حسابك
 
-# سحب بيانات GitHub
+# سحب بيانات الحساب من GitHub API
 url = f"https://api.github.com/users/{USERNAME}"
 data = requests.get(url).json()
 
+# استخراج الإحصائيات
 name = data.get("name", USERNAME)
 public_repos = data.get("public_repos", 0)
 followers = data.get("followers", 0)
 following = data.get("following", 0)
 
-# فتح الصورة JPEG
+# فتح الصورة من المسار assets/stats.jpg
 img_path = "assets/stats.jpg"
 img = Image.open(img_path).convert("RGBA")
 draw = ImageDraw.Draw(img)
+width, height = img.size
 
-font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 40)
+# اختيار الخط وحجمه
+try:
+    # المسار للخط في بيئات لينكس القياسية
+    font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 40)
+except IOError:
+    # استخدام الخط الافتراضي في حالة عدم العثور على الخط المحدد
+    font = ImageFont.load_default()
 
+# النصوص المراد كتابتها
 lines = [
     f"Name: {name}",
     f"Repos: {public_repos}",
@@ -26,25 +35,38 @@ lines = [
     f"Following: {following}"
 ]
 
+# حساب أبعاد كتلة النص
 padding = 20
-y = 50
+line_height = font.getsize("hg")[1]  # 'hg' للحصول على ارتفاع تقريبي
+total_text_height = len(lines) * line_height + (len(lines) - 1) * padding
+max_text_width = 0
 for line in lines:
-    bbox = draw.textbbox((0, 0), line, font=font)
-    text_width = bbox[2] - bbox[0]
-    text_height = bbox[3] - bbox[1]
+    line_width, _ = draw.textsize(line, font=font)
+    if line_width > max_text_width:
+        max_text_width = line_width
 
-    # مستطيل خلف النص
-    rect_x0 = 50 - padding
-    rect_y0 = y - padding
-    rect_x1 = 50 + text_width + padding
-    rect_y1 = y + text_height + padding
-    draw.rectangle(
-        [(rect_x0, rect_y0), (rect_x1, rect_y1)],
-        fill=(0, 0, 0, 150)
-    )
+# إعداد خلفية شبه شفافة للنصوص
+rect_width = max_text_width + 2 * padding
+rect_height = total_text_height + padding
+rect_x0 = (width - rect_width) / 2
+rect_y0 = (height - rect_height) / 2
+rect_x1 = rect_x0 + rect_width
+rect_y1 = rect_y0 + rect_height
 
-    draw.text((50, y), line, font=font, fill=(255, 255, 255, 255))
-    y += text_height + 2 * padding
+draw.rectangle(
+    [(rect_x0, rect_y0), (rect_x1, rect_y1)],
+    fill=(0, 0, 0, 150)  # أسود مع شفافية
+)
 
-# تحويل الصورة إلى RGB قبل الحفظ بصيغة JPEG
-img.convert("RGB").save(img_path)
+# كتابة النص فوق المستطيل
+y = rect_y0 + padding / 2
+for line in lines:
+    text_width, _ = draw.textsize(line, font=font)
+    x = (width - text_width) / 2
+    draw.text((x, y), line, font=font, fill=(255, 255, 255, 255))
+    y += line_height + padding
+
+# حفظ الصورة المعدلة بنفس الاسم والمكان
+img.save(img_path)
+
+print("تم تحديث الصورة بنجاح!")
