@@ -5,20 +5,18 @@ from collections import Counter
 import time
 
 USERNAME = "Hussain96o"
-# لا نستخدم التوكن بناءً على طلبك
-# GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN")
-# HEADERS = {"Authorization": f"token {GITHUB_TOKEN}"} if GITHUB_TOKEN else {}
 
 def get_github_stats(username):
     """
-    يجلب إحصائيات GitHub المتقدمة بدون توكن.
+    يجلب إحصائيات GitHub المتقدمة (الكوميتات، اللغات بالبايت، والمستودعات).
     """
     print("Fetching user and repository data (unauthenticated)...")
-    # ... باقي دالة get_github_stats لم تتغير ...
     user_url = f"https://api.github.com/users/{username}"
     user_data = requests.get(user_url).json()
+    
     public_repos_count = user_data.get("public_repos", 0)
     name = user_data.get("name", username)
+    
     repos_url = f"https://api.github.com/users/{username}/repos?type=owner&per_page=100"
     all_repos = []
     page = 1
@@ -26,21 +24,33 @@ def get_github_stats(username):
         response = requests.get(f"{repos_url}&page={page}")
         repos = response.json()
         if not repos or not isinstance(repos, list):
-            if isinstance(repos, dict) and 'message' in repos:
-                print(f"❌ API Error: {repos['message']}")
+            if isinstance(repos, dict) and 'message' in repos and 'API rate limit exceeded' in repos['message']:
+                print("❌ API rate limit exceeded while fetching repos. Stats will be incomplete.")
             break
         all_repos.extend(repos)
         page += 1
+        
     print(f"Found {len(all_repos)} repositories. Calculating stats...")
     total_commits = 0
-    language_counts = Counter()
+    language_bytes = Counter()
+    
     for i, repo in enumerate(all_repos):
         repo_name = repo['name']
         print(f"  - Processing repo {i+1}/{len(all_repos)}: {repo_name}")
-        language = repo.get("language")
-        if language:
-            language_counts[language] += 1
+        
+        # 1. جلب اللغات بالبايت (أكثر دقة)
+        languages_url = repo.get("languages_url")
+        try:
+            lang_response = requests.get(languages_url)
+            if lang_response.status_code == 200:
+                for lang, bytes_count in lang_response.json().items():
+                    language_bytes[lang] += bytes_count
+        except requests.exceptions.RequestException:
+            print(f"    - Could not fetch languages for {repo_name}")
+
+        # 2. جلب إحصائيات الكوميت
         commit_stats_url = f"https://api.github.com/repos/{username}/{repo_name}/stats/contributors"
+        # ... (باقي منطق الكوميت لم يتغير)
         for _ in range(3):
             stats_response = requests.get(commit_stats_url)
             if stats_response.status_code == 200:
@@ -54,17 +64,28 @@ def get_github_stats(username):
                  print("  - Rate limit likely exceeded. Skipping commit stats for this repo.")
                  break
             time.sleep(2)
-    top_languages = [lang for lang, count in language_counts.most_common(3)]
+
+    # 3. حساب النسب المئوية لأفضل لغتين
+    total_bytes = sum(language_bytes.values())
+    top_languages_stats = []
+    if total_bytes > 0:
+        for lang, count in language_bytes.most_common(2):
+            percentage = (count / total_bytes) * 100
+            top_languages_stats.append(f"{lang} {percentage:.1f}%")
+            
+    # معالجة الحالة الفارغة
+    if not top_languages_stats:
+        top_languages_stats = ["N/A"]
+    
     return {
         "name": name,
         "commits": total_commits,
         "repos": public_repos_count,
-        "languages": top_languages,
+        "languages": top_languages_stats,
     }
 
 def draw_column(draw, content, x, y, width, height, font_title, font_value):
-    title = content["title"]
-    value = str(content["value"])
+    title, value = content["title"], str(content["value"])
     cx = x + width / 2
     title_width = draw.textlength(title, font=font_title)
     draw.text((cx - title_width / 2, y + 25), title, font=font_title, fill=(220, 220, 220, 200))
@@ -76,20 +97,16 @@ if __name__ == "__main__":
     stats = get_github_stats(USERNAME)
     
     img = Image.open("assets/background.png").convert("RGBA")
-
-    # --- التغيير الرئيسي هنا ---
-    # تحميل الخطوط من مجلد assets مباشرة
+    
     try:
         font_title = ImageFont.truetype("assets/Poppins-Regular.ttf", size=18)
         font_value = ImageFont.truetype("assets/Poppins-Bold.ttf", size=36)
         font_lang = ImageFont.truetype("assets/Poppins-Regular.ttf", size=16)
     except IOError:
-        print("❌ خطأ: لم يتم العثور على ملفات الخطوط في مجلد assets. سيتم استخدام الخط الافتراضي.")
-        font_title = ImageFont.load_default()
-        font_value = ImageFont.load_default()
-        font_lang = ImageFont.load_default()
+        print("❌ خطأ: لم يتم العثور على ملفات الخطوط. استخدم الخط الافتراضي.")
+        font_title, font_value, font_lang = [ImageFont.load_default()] * 3
 
-    # --- باقي الكود لم يتغير ---
+    # ... باقي كود الرسم لم يتغير ...
     img_width, img_height = img.size
     box_width, box_height = 550, 150
     margin, border_radius = 40, 20
@@ -130,4 +147,4 @@ if __name__ == "__main__":
 
     output_path = "assets/stats.png"
     img.save(output_path, "PNG")
-    print(f"✅ تم تحديث الصورة بنجاح بالتصميم الجديد!")
+    print(f"✅ تم تحديث الصورة بنجاح مع تصحيح إحصائيات اللغات!")
