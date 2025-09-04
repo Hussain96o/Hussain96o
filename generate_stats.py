@@ -1,7 +1,5 @@
 import requests
-from weasyprint import HTML
-from pdf2image import convert_from_path
-from PIL import Image
+from weasyprint import HTML, CSS # قد نحتاج لاستيراد CSS للتحكم الدقيق
 import base64
 import os
 
@@ -21,7 +19,6 @@ followers = data.get("followers", 0)
 following = data.get("following", 0)
 
 # --- تحويل الخلفية إلى Base64 ---
-# تأكد من أن ملف background.png موجود في مجلد assets
 with open("assets/background.png", "rb") as f:
     encoded_bg = base64.b64encode(f.read()).decode()
 
@@ -29,6 +26,7 @@ with open("assets/background.png", "rb") as f:
 width, height = 1280, 720  # أبعاد 16:9 بجودة أعلى
 
 # --- HTML + CSS ---
+# الكود هنا لم يتغير
 html_template = f"""
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
@@ -43,23 +41,21 @@ html_template = f"""
         background-size: cover;
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }}
-    /* جعل body يأخذ كامل مساحة html وتهيئته لتحديد موضع العناصر الفرعية */
     body {{
         width: 100%;
         height: 100%;
         margin: 0;
         padding: 0;
-        position: relative; /* ضروري لتحديد موضع div الإحصائيات بالنسبة له */
+        position: relative;
     }}
-    /* صندوق الإحصائيات */
     .stats-box {{
-        position: absolute; /* تحديد الموضع بشكل مطلق بالنسبة لأقرب عنصر له position: relative (وهو body) */
-        bottom: 25px; /* 25 بكسل من الأسفل */
-        right: 25px;  /* 25 بكسل من اليمين */
+        position: absolute;
+        bottom: 25px;
+        right: 25px;
         background: rgba(0,0,0,0.65);
         padding: 15px 30px;
         border-radius: 12px;
-        text-align: right; /* محاذاة النص لليمين */
+        text-align: right;
         color: white;
     }}
     .stats-box p {{
@@ -85,16 +81,9 @@ html_template = f"""
 </html>
 """
 
-# --- حفظ PDF أولاً ---
-pdf_path = "assets/stats.pdf"
-HTML(string=html_template).write_pdf(pdf_path)
+# --- التحويل المباشر من HTML إلى PNG ---
+# هذه هي الخطوة الجديدة والمبسطة
+output_path = "assets/stats.png"
+HTML(string=html_template).write_png(output_path)
 
-# --- تحويل PDF إلى PNG بنفس الأبعاد 16:9 للحفاظ على الجودة ---
-# نستخدم معامل size لتحديد الأبعاد النهائية مباشرة بدلاً من dpi ثم resize
-pages = convert_from_path(pdf_path, size=(width, height), fmt='png')
-if pages:
-    img = pages[0]
-    img.save("assets/stats.png", "PNG")
-    print(f"✅ تم تحديث الصورة stats.png بنجاح بأبعاد {width}x{height} وجودة عالية!")
-else:
-    print("❌ فشل في تحويل PDF إلى صورة.")
+print(f"✅ تم تحديث الصورة stats.png مباشرة بنجاح بأبعاد {width}x{height}!")
