@@ -1,117 +1,180 @@
 import requests
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
 import os
+from collections import Counter
+import time
 
 USERNAME = "Hussain96o"
+GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN")
+HEADERS = {"Authorization": f"token {GITHUB_TOKEN}"} if GITHUB_TOKEN else {}
 
-# --- التأكد من وجود مجلد assets ---
-if not os.path.exists("assets"):
-    os.makedirs("assets")
+def get_github_stats(username):
+    """
+    يجلب إحصائيات GitHub المتقدمة (الكوميتات، النجوم، واللغات).
+    """
+    print("Fetching user and repository data...")
+    user_url = f"https://api.github.com/users/{username}"
+    user_data = requests.get(user_url, headers=HEADERS).json()
+    
+    public_repos_count = user_data.get("public_repos", 0)
+    name = user_data.get("name", username)
+    
+    repos_url = f"https://api.github.com/users/{username}/repos?type=owner&per_page=100"
+    all_repos = []
+    page = 1
+    while True:
+        response = requests.get(f"{repos_url}&page={page}", headers=HEADERS)
+        repos = response.json()
+        if not repos or not isinstance(repos, list):
+            break
+        all_repos.extend(repos)
+        page += 1
+        
+    print(f"Found {len(all_repos)} repositories. Calculating stats...")
+    total_commits = 0
+    language_counts = Counter()
+    
+    for i, repo in enumerate(all_repos):
+        repo_name = repo['name']
+        print(f"  - Processing repo {i+1}/{len(all_repos)}: {repo_name}")
+        
+        # إحصاء اللغات
+        language = repo.get("language")
+        if language:
+            language_counts[language] += 1
+            
+        # جلب إحصائيات الكوميت (هذه العملية قد تكون بطيئة)
+        commit_stats_url = f"https://api.github.com/repos/{username}/{repo_name}/stats/contributors"
+        # قد تستغرق واجهة API بعض الوقت لتجهيز الإحصائيات
+        for _ in range(3): # محاولة 3 مرات
+            stats_response = requests.get(commit_stats_url, headers=HEADERS)
+            if stats_response.status_code == 200:
+                contributors = stats_response.json()
+                if isinstance(contributors, list):
+                    for contributor in contributors:
+                        if contributor['author']['login'].lower() == username.lower():
+                            total_commits += contributor['total']
+                break # اخرج من حلقة المحاولات عند النجاح
+            time.sleep(2) # انتظر ثانيتين قبل المحاولة مرة أخرى
 
-# --- جلب بيانات الحساب مع معالجة الأخطاء ---
-try:
-    url = f"https://api.github.com/users/{USERNAME}"
-    data = requests.get(url).json()
-    # التحقق من أن المفاتيح موجودة قبل استخدامها
-    name = data.get("name", USERNAME)
-    public_repos = data.get("public_repos", 0)
-    followers = data.get("followers", 0)
-    following = data.get("following", 0)
-    print("✅ تم جلب بيانات GitHub بنجاح.")
-except requests.exceptions.RequestException as e:
-    print(f"❌ خطأ في الاتصال بـ GitHub API: {e}")
-    # في حالة الفشل، نستخدم بيانات افتراضية حتى لا يتوقف السكريبت
-    name, public_repos, followers, following = "GitHub User", 0, 0, 0
+    # تجهيز أفضل 3 لغات
+    top_languages = [lang for lang, count in language_counts.most_common(3)]
+    
+    return {
+        "name": name,
+        "commits": total_commits,
+        "repos": public_repos_count,
+        "languages": top_languages,
+    }
 
-# --- إعداد الصورة ---
-try:
-    # 1. افتح صورة الخلفية وتأكد 100% من تحويلها لوضع الشفافية
-    # هذا السطر هو أهم سطر لضمان عمل الشفافية
+def draw_column(draw, content, x, y, width, height, font_title, font_value):
+    """
+    يرسم عمودًا واحدًا مع توسيط محتواه.
+    """
+    title = content["title"]
+    value = str(content["value"])
+    
+    cx = x + width / 2 # مركز العمود الأفقي
+    
+    # رسم العنوان في الأعلى
+    title_width = draw.textlength(title, font=font_title)
+    draw.text(
+        (cx - title_width / 2, y + 25), 
+        title, 
+        font=font_title, 
+        fill=(220, 220, 220, 200) # لون رمادي فاتح
+    )
+    
+    # رسم القيمة في المنتصف
+    value_width = draw.textlength(value, font=font_value)
+    draw.text(
+        (cx - value_width / 2, y + (height / 2) - 10),
+        value,
+        font=font_value,
+        fill=(255, 255, 255) # لون أبيض ساطع
+    )
+
+# --- الجزء الرئيسي من السكريبت ---
+if __name__ == "__main__":
+    stats = get_github_stats(USERNAME)
+    
+    # --- إعداد الصورة ---
     img = Image.open("assets/background.png").convert("RGBA")
-except FileNotFoundError:
-    print("❌ خطأ: لم يتم العثور على ملف الخلفية 'assets/background.png'. تأكد من وجوده.")
-    exit()
+    font_title = ImageFont.truetype("arial.ttf", size=18)
+    font_value = ImageFont.truetype("arialbd.ttf", size=36) # خط عريض للقيم
+    
+    # --- أبعاد الصندوق والأعمدة ---
+    img_width, img_height = img.size
+    box_width, box_height = 550, 150
+    margin = 40
+    border_radius = 20
+    
+    box_x0, box_y0 = img_width - box_width - margin, img_height - box_height - margin
+    box_x1, box_y1 = img_width - margin, img_height - margin
+    
+    # --- تطبيق التأثير الزجاجي (مع زوايا مستديرة) ---
+    box_crop = img.crop((box_x0, box_y0, box_x1, box_y1))
+    blurred_box = box_crop.filter(ImageFilter.GaussianBlur(radius=15))
+    
+    # إنشاء طبقة زجاجية شفافة ومستديرة
+    glass_layer = Image.new("RGBA", (box_width, box_height), (255, 255, 255, 0))
+    draw_glass = ImageDraw.Draw(glass_layer)
+    draw_glass.rounded_rectangle(
+        (0, 0, box_width, box_height),
+        radius=border_radius,
+        fill=(255, 255, 255, 30),
+        outline=(255, 255, 255, 80),
+        width=2
+    )
+    
+    final_box = Image.alpha_composite(blurred_box, glass_layer)
+    img.paste(final_box, (box_x0, box_y0))
 
-# 2. حمّل الخط
-try:
-    font_header = ImageFont.truetype("arialbd.ttf", size=28)
-    font_body = ImageFont.truetype("arial.ttf", size=20)
-except IOError:
-    print("⚠️ تحذير: لم يتم العثور على خط Arial. سيتم استخدام الخط الافتراضي.")
-    font_header = ImageFont.load_default()
-    font_body = ImageFont.load_default()
+    # --- رسم الأعمدة والمحتوى ---
+    draw = ImageDraw.Draw(img)
+    column_width = box_width / 3
+    
+    # محتوى الأعمدة
+    columns_data = [
+        {"title": "Total Commits", "value": stats['commits']},
+        {"title": "Public Repos", "value": stats['repos']},
+        {"title": "Top Languages", "value": "\n".join(stats['languages'])},
+    ]
 
-# --- حساب الأبعاد ---
-img_width, img_height = img.size
-margin = 40      # الهامش الخارجي من حافة الصورة
-padding = 30     # الهامش الداخلي في الصندوق
-line_spacing = 15 # المسافة بين السطور
+    # تغيير خط اللغات ليكون أصغر
+    font_lang = ImageFont.truetype("arial.ttf", size=16)
 
-lines = [
-    (f"Public Repos: {public_repos}", font_body),
-    (f"Followers: {followers}", font_body),
-    (f"Following: {following}", font_body),
-]
+    # العمود الأول (Commits)
+    draw_column(draw, columns_data[0], box_x0, box_y0, column_width, box_height, font_title, font_value)
 
-# حساب عرض وارتفاع الصندوق بشكل ديناميكي
-box_width = int(max(ImageDraw.Draw(img).textlength(text, font=font) for text, font in lines + [(name, font_header)]) + (padding * 2))
-box_height = int(font_header.getbbox(name)[3] + (padding * 2) + (font_body.getbbox("T")[3] * len(lines)) + (line_spacing * (len(lines))))
+    # العمود الثاني (Repos)
+    draw_column(draw, columns_data[1], box_x0 + column_width, box_y0, column_width, box_height, font_title, font_value)
 
-# تحديد إحداثيات الصندوق
-box_x0 = img_width - box_width - margin
-box_y0 = img_height - box_height - margin
-box_x1 = img_width - margin
-box_y1 = img_height - margin
+    # العمود الثالث (Languages) - يتم رسمه بشكل خاص لأنه نص متعدد الأسطر
+    lang_title = columns_data[2]["title"]
+    lang_value = columns_data[2]["value"]
+    lang_cx = box_x0 + (column_width * 2.5) # مركز العمود الثالث
+    
+    title_width = draw.textlength(lang_title, font=font_title)
+    draw.text((lang_cx - title_width / 2, box_y0 + 25), lang_title, font=font_title, fill=(220, 220, 220, 200))
+    
+    # رسم اللغات في المنتصف
+    draw.multiline_text(
+        (lang_cx, box_y0 + (box_height / 2) + 5),
+        lang_value,
+        font=font_lang,
+        fill=(255, 255, 255),
+        anchor="mm", # توسيط أفقي وعمودي
+        align="center"
+    )
 
-# --- [الطريقة الموثوقة] تطبيق تأثير الزجاج الشفاف ---
+    # رسم الخطوط الفاصلة
+    line_color = (255, 255, 255, 80)
+    line_y0, line_y1 = box_y0 + 20, box_y1 - 20
+    draw.line((box_x0 + column_width, line_y0, box_x0 + column_width, line_y1), fill=line_color, width=2)
+    draw.line((box_x0 + 2 * column_width, line_y0, box_x0 + 2 * column_width, line_y1), fill=line_color, width=2)
 
-# 1. قص منطقة الصندوق من الخلفية الأصلية
-box_crop = img.crop((box_x0, box_y0, box_x1, box_y1))
-
-# 2. طبّق ضبابية على الجزء المقصوص
-blurred_box = box_crop.filter(ImageFilter.GaussianBlur(radius=10))
-
-# 3. أنشئ طبقة زجاجية منفصلة وشفافة تماماً
-glass_layer = Image.new("RGBA", (box_width, box_height), (255, 255, 255, 0))
-
-# 4. ارسم المستطيل الأبيض شبه الشفاف على هذه الطبقة الجديدة
-draw_glass = ImageDraw.Draw(glass_layer)
-draw_glass.rectangle(
-    (0, 0, box_width, box_height),
-    fill=(255, 255, 255, 40),       # طبقة بيضاء خفيفة لمحاكاة الزجاج
-    outline=(255, 255, 255, 90),    # إطار أبيض خفيف
-    width=2
-)
-
-# 5. ادمج الطبقة الضبابية مع الطبقة الزجاجية باستخدام alpha_composite
-#    هذه الدالة تضمن دمج الشفافية بشكل صحيح
-final_box = Image.alpha_composite(blurred_box, glass_layer)
-
-# 6. الصق الصندوق النهائي (الذي يحتوي على كل التأثيرات) على الصورة الأصلية
-img.paste(final_box, (box_x0, box_y0))
-
-# --- كتابة النصوص فوق الصندوق النهائي ---
-draw = ImageDraw.Draw(img)
-text_color = (15, 15, 15)  # لون نص داكن للوضوح
-current_y = box_y0 + padding
-
-# كتابة الاسم
-name_width = draw.textlength(name, font=font_header)
-draw.text((box_x1 - padding - name_width, current_y), name, font=font_header, fill=text_color)
-current_y += font_header.getbbox(name)[3] + line_spacing
-
-# رسم خط فاصل
-draw.line([box_x0 + padding, current_y, box_x1 - padding, current_y], fill=(0, 0, 0, 80), width=1)
-current_y += line_spacing
-
-# كتابة الإحصائيات
-for text, font in lines:
-    text_width = draw.textlength(text, font=font)
-    draw.text((box_x1 - padding - text_width, current_y), text, font=font, fill=text_color)
-    current_y += font.getbbox(text)[3] + line_spacing
-
-# --- حفظ الصورة النهائية ---
-output_path = "assets/stats.png"
-img.save(output_path, "PNG")
-
-print(f"✅ تم تحديث الصورة '{output_path}' بنجاح مع التأثير الزجاجي الصحيح.")
+    # --- حفظ الصورة ---
+    output_path = "assets/stats.png"
+    img.save(output_path, "PNG")
+    print(f"✅ تم تحديث الصورة بنجاح بالتصميم الجديد!")
