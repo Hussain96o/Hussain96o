@@ -1,5 +1,6 @@
 import requests
 from weasyprint import HTML
+from pdf2image import convert_from_path
 
 USERNAME = "Hussain96o"  # ضع هنا اسم حسابك
 
@@ -7,14 +8,12 @@ USERNAME = "Hussain96o"  # ضع هنا اسم حسابك
 url = f"https://api.github.com/users/{USERNAME}"
 data = requests.get(url).json()
 
-# استخراج البيانات
 name = data.get("name", USERNAME)
 public_repos = data.get("public_repos", 0)
 followers = data.get("followers", 0)
 following = data.get("following", 0)
 
 # --- HTML + CSS ---
-# الخلفية من الصورة الثابتة background.png
 html_template = f"""
 <!DOCTYPE html>
 <html lang="en">
@@ -58,7 +57,11 @@ html_template = f"""
 </html>
 """
 
-# --- تحويل HTML إلى صورة PNG ---
-HTML(string=html_template).write_png("assets/stats.png")
+# --- حفظ PDF أولاً ---
+HTML(string=html_template).write_pdf("assets/stats.pdf")
+
+# --- تحويل PDF إلى PNG ---
+pages = convert_from_path("assets/stats.pdf", dpi=200)
+pages[0].save("assets/stats.png", "PNG")
 
 print("✅ تم تحديث الصورة stats.png بنجاح!")
