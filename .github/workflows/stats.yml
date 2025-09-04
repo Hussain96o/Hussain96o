@@ -2,8 +2,8 @@ name: Update GitHub Stats Image
 
 on:
   schedule:
-    - cron: "0 0 * * *" # يحدث يومياً الساعة 00:00
-  workflow_dispatch: # لتشغيله يدوياً
+    - cron: "0 0 * * *"  # يحدث يومياً الساعة 00:00
+  workflow_dispatch:        # لتشغيله يدوياً
 
 jobs:
   update-image:
@@ -28,6 +28,8 @@ jobs:
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          # إضافة الصور فقط، لا تضيف أي ملفات workflow
           git add assets/stats.jpg
+          # إذا تغيّرت الصورة، اعمل commit
           git diff --cached --quiet || git commit -m "Update stats image"
           git push
