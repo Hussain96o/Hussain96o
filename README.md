@@ -1,9 +1,8 @@
-
 ![](<./assets/Banner .png>)
-
 <p align="center">
   <img src="https://komarev.com/ghpvc/?username=Hussain96o&label=Profile+Views&color=8ae009&style=flat-square" alt="Profile Views" />
 </p>
+![](<./assets/stats.jpg>)
 
 ---
 
