@@ -3,9 +3,9 @@ from weasyprint import HTML
 from pdf2image import convert_from_path
 import base64
 
-USERNAME = "Hussain96o"  # ضع هنا اسم حسابك
+USERNAME = "Hussain96o"
 
-# --- جلب بيانات الحساب من GitHub API ---
+# --- جلب بيانات GitHub API ---
 url = f"https://api.github.com/users/{USERNAME}"
 data = requests.get(url).json()
 
@@ -18,6 +18,10 @@ following = data.get("following", 0)
 with open("assets/background.png", "rb") as f:
     encoded_bg = base64.b64encode(f.read()).decode()
 
+# --- أبعاد 16:9 ---
+height = 720
+width = int(height * 16 / 9)  # عرض أكبر من الطول
+
 # --- HTML + CSS ---
 html_template = f"""
 <!DOCTYPE html>
@@ -26,8 +30,8 @@ html_template = f"""
   <meta charset="UTF-8">
   <style>
     body {{
-        width: 800px;
-        height: 600px;
+        width: {width}px;
+        height: {height}px;
         background: url('data:image/png;base64,{encoded_bg}') no-repeat center center;
         background-size: cover;
         display: flex;
@@ -69,4 +73,4 @@ HTML(string=html_template).write_pdf("assets/stats.pdf")
 pages = convert_from_path("assets/stats.pdf", dpi=200)
 pages[0].save("assets/stats.png", "PNG")
 
-print("✅ تم تحديث الصورة stats.png بنجاح مع الخلفية!")
+print("✅ تم تحديث الصورة stats.png بنجاح بنسبة أبعاد 16:9!")
