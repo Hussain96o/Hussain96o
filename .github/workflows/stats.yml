@@ -18,18 +18,15 @@ jobs:
         with:
           python-version: '3.x'
 
-      - name: Install system dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y \
-            libpango-1.0-0 \
-            libcairo2 \
-            libpangoft2-1.0-0 \
-            libpangocairo-1.0-0 \
-            poppler-utils
+      # --- التغيير هنا ---
+      # لم نعد بحاجة للاعتماديات القديمة مثل cairo و poppler
+      # - name: Install system dependencies
+      #  ... (تم حذف هذا الجزء بالكامل)
 
+      # --- التغيير هنا ---
+      # نقوم الآن بتثبيت Pillow فقط بالإضافة إلى requests
       - name: Install Python dependencies
-        run: pip install requests weasyprint pdf2image
+        run: pip install requests Pillow
 
       - name: Generate stats image
         run: python generate_stats.py
@@ -39,5 +36,11 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add assets/stats.png
-          git diff --cached --quiet || git commit -m "Update stats image"
-          git push
+          # استخدم --amend لتجنب إنشاء سجل commit ضخم مع الوقت
+          # أو استخدم الرسالة العادية إذا كنت تفضل ذلك
+          if ! git diff --cached --quiet; then
+            git commit -m "📊 Update GitHub stats image"
+            git push
+          else
+            echo "No changes to commit."
+          fi
