@@ -2,6 +2,7 @@ import requests
 from weasyprint import HTML
 from pdf2image import convert_from_path
 import base64
+from PIL import Image  # إضافة مكتبة Pillow لقراءة أبعاد الصورة
 
 USERNAME = "Hussain96o"
 
@@ -18,9 +19,9 @@ following = data.get("following", 0)
 with open("assets/background.png", "rb") as f:
     encoded_bg = base64.b64encode(f.read()).decode()
 
-# --- أبعاد 16:9 ---
-height = 720
-width = int(height * 16 / 9)  # عرض أكبر من الطول
+# --- قراءة أبعاد الصورة الأصلية ---
+with Image.open("assets/background.png") as img:
+    width, height = img.size  # الحصول على الأبعاد الأصلية للصورة
 
 # --- HTML + CSS ---
 html_template = f"""
@@ -73,4 +74,4 @@ HTML(string=html_template).write_pdf("assets/stats.pdf")
 pages = convert_from_path("assets/stats.pdf", dpi=200)
 pages[0].save("assets/stats.png", "PNG")
 
-print("✅ تم تحديث الصورة stats.png بنجاح بنسبة أبعاد 16:9!")
+print(f"✅ تم تحديث الصورة stats.png بنجاح بأبعاد الصورة الأصلية ({width}x{height})!")
