@@ -1,17 +1,21 @@
 ![Banner ](<./assets/Banner .png>)
 
 ---
-
+### My Skills  
 <div align="center">
-  <div style="display: flex; align-items: center; justify-content: center; gap: 20px;">
-    <img src="assets/ski.jpg" width="160" alt="Skills Icon" />
-    <div>
-      <h3> My Skills</h3>
-      <p>
-        <img src="https://img.shields.io/badge/HTML5-%23E34F26.svg?style=for-the-badge&logo=html5&logoColor=white" />
-        <img src="https://img.shields.io/badge/CSS3-%231572B6.svg?style=for-the-badge&logo=css3&logoColor=white" />
-      </p>
-    </div>
+  <div style="display: flex; align-items: center; gap: 20px;">
+    
+  <!-- صورة skills -->
+  <img src="assets/ski.jpg" width="120" alt="Skills Icon" />
+
+  <!-- الشارات -->
+  <div>
+    <p>
+      <img src="https://img.shields.io/badge/HTML5-%23E34F26.svg?style=for-the-badge&logo=html5&logoColor=white" />
+      <img src="https://img.shields.io/badge/CSS3-%231572B6.svg?style=for-the-badge&logo=css3&logoColor=white" />
+    </p>
+  </div>
+
   </div>
 </div>
 
