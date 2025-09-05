@@ -1,6 +1,3 @@
----
-type: Journal
----
 
 ![](<./assets/Banner .png>)
 
