@@ -1,4 +1,4 @@
-![Banner ](<./assets/Banner .png>)
+
 
 ---
 ### My Skills  
@@ -6,7 +6,6 @@
   <div style="display: flex; align-items: center; gap: 20px;">
     
   <!-- صورة skills -->
-  <img src="assets/ski.jpg" width="120" alt="Skills Icon" />
 
   <!-- الشارات -->
   <div>
